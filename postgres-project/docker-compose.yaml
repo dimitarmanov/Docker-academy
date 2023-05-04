@@ -1,0 +1,29 @@
+services:
+  dmadb:
+    image: postgres:11
+    networks:
+      - postgres_dmanov_network
+    environment:
+      POSTGRES_USER: 'dma'
+      POSTGRES_PASSWORD: 'dma123'
+      POSTGRES_DB: 'postgres_db'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - postgresql_data_dma:/var/lib/postgresql/data
+
+  admindma:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "dmanov@dma.com"
+      PGADMIN_DEFAULT_PASSWORD: "dma123"
+    networks:
+      - postgres_dmanov_network
+    ports:
+      - "7777:80"
+
+
+volumes:
+  postgresql_data_dma:
+
+networks:
+  postgres_dmanov_network:

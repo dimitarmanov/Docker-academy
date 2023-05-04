@@ -1,12 +1,19 @@
-from time import sleep
+from datetime import datetime
 
-print('DevOps!')
+from flask import Flask, render_template, jsonify
 
-i = 0
-while True:
-    print("Count is ", i)
-    i += 1
-    sleep(1)
+app = Flask(__name__)
 
+@app.route('/')
+def index():
+    return render_template('index.html')
 
+@app.route('/info')
+def info():
+    return jsonify({
+        "status": "OK",
+        "time": datetime.now()
+    })
 
+if __name__ == '__main__':
+    app.run(port=5000, debug=True, host="0.0.0.0")

@@ -1,0 +1,5 @@
+services:
+  my-app:
+    image: dmanov/web_app:latest
+    ports:
+      - "8888:5000"
