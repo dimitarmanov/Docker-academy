@@ -1,0 +1,6 @@
+{
+    config: {
+        Country: Bulgaria,
+        City:Sofia
+    }
+}

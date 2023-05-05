@@ -1,0 +1,33 @@
+services:
+
+  website:
+    image: website:latest
+    ports:
+      - 8080:80
+    deploy:
+      replicas: 4
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        reservations:
+          memory: 128M
+        limits:
+          memory: 256M
+    configs:
+      - source: myconfig
+        target: /configs/myconfig
+    secrets:
+      - source: mysecret
+        target: /secrets/passworlds
+      - source: localsecret
+        target: /secrets/localsecret
+
+secrets:
+  localsecret:
+    file: ./localsecret.txt
+  mysecret:
+    external: true
+
+configs:
+  myconfig:
+    file: ./config.txt

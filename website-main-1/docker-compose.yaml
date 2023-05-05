@@ -1,0 +1,7 @@
+services:
+  web_app:
+    image: website1
+    ports:
+      - "8081:80"
+
+

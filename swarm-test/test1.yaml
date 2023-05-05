@@ -1,0 +1,38 @@
+services:
+  web_app:
+    image: website1
+    ports:
+      - "8080:80"
+    deploy:
+      replicas: 4
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          memory: 250M
+    configs:
+      - source: local_conf
+        target: /configs/local_conf
+    secrets:
+      - source: local_secret
+        target: /secrets/local-secret
+      - source: terminal_secret
+        target: /secrets/terminal_secret
+
+
+
+configs:
+  local_conf:
+    file: ./local-config.txt
+#  outside_conf:
+
+secrets:
+  local_secret:
+    file: ./local-secret.txt
+  terminal_secret:
+    external: True
+
+
+
+
+
