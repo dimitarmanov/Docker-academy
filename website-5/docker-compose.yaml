@@ -1,0 +1,5 @@
+services:
+  webapp5:
+    image: web-app5
+    ports:
+      - "8085:80"
