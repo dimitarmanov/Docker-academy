@@ -1,0 +1,5 @@
+services:
+  web-app2:
+    image: web-app2
+    ports:
+      - "8082:80"
