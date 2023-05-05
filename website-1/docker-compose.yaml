@@ -1,6 +1,6 @@
 services:
   web_app:
-    image: website1
+    image: web-app1
     ports:
       - "8081:80"
 
