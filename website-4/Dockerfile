@@ -1,14 +1,12 @@
-FROM python:3.9
+FROM python:latest AS builder
 
 WORKDIR /app
 
-COPY . .
+COPY ./requirements.txt /app
 RUN apt-get update && apt-get install -y npm
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-RUN pip install lektor
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
-RUN pip install --no-cache-dir --upgrade lektor
+COPY . /app
 
+CMD ["lektor", "server", "-f", "webpack", "--host", "0.0.0.0", "--port", "8080"]
 
-
-CMD ["lektor server -f webpack","--host","0.0.0.0", "--port", "80"]

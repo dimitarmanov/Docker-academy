@@ -1,0 +1,5 @@
+services:
+  python-app:
+    image: web-app4
+    ports:
+      - "8084:8080"
