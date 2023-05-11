@@ -1,0 +1,19 @@
+services:
+
+  client:
+    build:
+      context: client/
+    ports:
+      - '8080:80'
+    networks:
+      app-network:
+
+#  server:
+#    build:
+#      context: server/
+#    networks:
+#      app-network:
+
+
+networks:
+  app-network:

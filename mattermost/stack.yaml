@@ -1,0 +1,53 @@
+version: '3.1'
+
+services:
+
+  wordpress:
+    image: wordpress
+    deploy:
+      replicas: 4
+      placement:
+        constraints: [ node.role == manager ]
+      resources:
+        limits:
+          memory: 250M
+      restart_policy:
+        max_attempts: 5
+      update_config:
+        parallelism: 4
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: dmawp
+      WORDPRESS_DB_PASSWORD: admin123
+      WORDPRESS_DB_NAME: dmadb
+    volumes:
+      - wordpress:/var/www/html
+
+  db:
+    image: mysql
+    deploy:
+      replicas: 2
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          memory: 250M
+      restart_policy:
+        max_attempts: 5
+      update_config:
+        parallelism: 2
+    restart: always
+    environment:
+      MYSQL_DATABASE: dmadb
+      MYSQL_USER: dmawp
+      MYSQL_PASSWORD: admin123
+      MYSQL_ROOT_PASSWORD: admin
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  wordpress:
+  db:

@@ -1,0 +1,136 @@
+version: '3.7'
+services:
+
+
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf
+    restart: always
+    environment:
+      HOSTNAME: telegraf-mac-os
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    networks:
+      tick_net:
+    depends_on:
+      - influxdb
+
+
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb
+    restart: always
+    environment:
+      - INFLUXDB_DB=influx
+      - INFLUXDB_ADMIN_USER=admin123
+      - INFLUXDB_ADMIN_PASSWORD=admin123
+    ports:
+      - '8086:8086'
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+      - ./influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
+    networks:
+      tick_net:
+
+
+  chronograf:
+    image: chronograf:latest
+    ports:
+      - '8888:8888'
+    volumes:
+      - chronograf_data:/var/lib/chronograf
+    environment:
+      RESOURCES_PATH: /usr/share/chronograf/resources
+    networks:
+      tick_net:
+    links:
+      - influxdb
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - '3000:3000'
+    restart: always
+    volumes:
+      - grafana_data:/var/lib/grafana:rw
+    networks:
+      tick_net:
+    links:
+      - influxdb
+
+
+  kapacitor:
+    image: kapacitor:latest
+    volumes:
+      - kapacitor_data:/var/lib/kapacitor
+      - ./kapacitor/kapacitor.conf:/etc/kapacitor/kapacitor.conf
+    links:
+      - influxdb
+    networks:
+      tick_net:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+    volumes:
+      - type: bind
+        source: ./elasticsearch/config/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+        read_only: true
+      - type: volume
+        source: elasticsearch
+        target: /usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_PASSWORD: admin
+      # Use single node discovery in order to disable production mode and avoid bootstrap checks
+      # see https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+      discovery.type: single-node
+    networks:
+      - tick_net
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.6.2
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    ports:
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - tick_net
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/logstash/logstash:7.6.2
+    volumes:
+      - type: bind
+        source: ./kibana/config/kibana.yml
+        target: /usr/share/kibana/config/kibana.yml
+        read_only: true
+    ports:
+      - "5601:5601"
+    networks:
+      - tick_net
+    depends_on:
+      - elasticsearch
+
+
+
+
+networks:
+  tick_net:
+
+volumes:
+  influxdb_data:
+  chronograf_data:
+  kapacitor_data:
+  grafana_data:
+  elasticsearch:
